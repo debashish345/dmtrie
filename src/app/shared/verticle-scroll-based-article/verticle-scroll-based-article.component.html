@@ -1,0 +1,51 @@
+<div class="w- flex justify-center py-8 px-4"> <div class="max-w-3xl w-full space-y-6"> @for (block of articleBlocks; track block) {
+      @if (block.type === 'heading') {
+        <h1 class="text-3xl font-bold text-gray-800 text-center"> {{ block.content }}
+        </h1>
+      }
+
+      @if (block.type === 'subheading') {
+        <h2 class="text-2xl font-semibold text-gray-700 text-center"> {{ block.content }}
+        </h2>
+      }
+
+      @if (block.type === 'paragraph') {
+        <p class="text-base text-gray-600">
+          {{ block.content }}
+        </p>
+      }
+
+      @if (block.type === 'image') {
+        <img
+          [src]="block.src"
+          [alt]="block.alt || 'image'"
+          class="w-full rounded-lg shadow-md mx-auto" />
+      }
+
+      @if (block.type === 'video') {
+        <video
+          [src]="block.src"
+          controls
+          class="w-full rounded-lg shadow-md mx-auto" ></video>
+      }
+
+      @if (block.type === 'code') {
+        <pre class="bg-gray-900 text-white rounded p-4 overflow-x-auto">
+          <code [innerText]="block.content"></code>
+        </pre>
+      }
+
+      @if (block.type === 'link') {
+        <div class="text-center"> <a
+            [href]="block.href"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="text-blue-600 underline hover:text-blue-800"
+          >
+            {{ block.text }}
+          </a>
+        </div>
+      }
+    }
+  </div>
+</div>

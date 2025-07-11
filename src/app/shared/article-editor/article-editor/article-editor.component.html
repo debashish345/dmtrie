@@ -1,0 +1,159 @@
+<form [formGroup]="articleForm" (ngSubmit)="onSubmit()" class="p-8 max-w-4xl mx-auto bg-gray-100 shadow-lg rounded-lg">
+  <h2 class="text-3xl font-bold mb-6 text-gray-800 text-center">Article Editor</h2>
+
+  <div class="mb-6">
+    <label for="title" class="block text-gray-700 text-sm font-bold mb-2">Article Title:</label>
+    <input id="title" type="text" formControlName="title"
+           class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+    <div *ngIf="articleForm.get('title')?.invalid && articleForm.get('title')?.touched" class="text-red-500 text-xs italic mt-1">
+      Title is required.
+    </div>
+  </div>
+
+  <h3 class="text-2xl font-semibold mb-4 text-gray-700">Article Blocks</h3>
+  <div formArrayName="blocks" class="space-y-6">
+    <div *ngFor="let blockControl of blocks.controls; let i = index" [formGroupName]="i"
+         class="bg-white p-6 rounded-lg shadow-md border border-gray-200">
+      <div class="flex justify-between items-center mb-4">
+        <h4 class="text-xl font-medium text-gray-800">Block #{{ i + 1 }} - <span class="capitalize">{{ blockControl.get('type')?.value }}</span></h4>
+        <div class="flex space-x-2">
+          <button type="button" (click)="moveBlockUp(i)" [disabled]="i === 0"
+                  class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-3 rounded focus:outline-none focus:shadow-outline disabled:opacity-50">
+            ⬆️
+          </button>
+          <button type="button" (click)="moveBlockDown(i)" [disabled]="i === blocks.length - 1"
+                  class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-3 rounded focus:outline-none focus:shadow-outline disabled:opacity-50">
+            ⬇️
+          </button>
+          <button type="button" (click)="addBlock('paragraph', i)"
+                  class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-3 rounded focus:outline-none focus:shadow-outline text-sm">
+            Add Before
+          </button>
+          <button type="button" (click)="removeBlock(i)"
+                  class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-3 rounded focus:outline-none focus:shadow-outline">
+            🗑️
+          </button>
+        </div>
+      </div>
+
+      <ng-container [ngSwitch]="blockControl.get('type')?.value">
+        <div *ngSwitchCase="'heading'" class="mb-4">
+          <label for="heading-{{i}}" class="block text-gray-700 text-sm font-bold mb-2">Heading Content:</label>
+          <input id="heading-{{i}}" type="text" formControlName="content"
+                 class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+          <div *ngIf="blockControl.get('content')?.invalid && blockControl.get('content')?.touched" class="text-red-500 text-xs italic mt-1">
+            Heading content is required.
+          </div>
+        </div>
+
+        <div *ngSwitchCase="'subheading'" class="mb-4">
+          <label for="subheading-{{i}}" class="block text-gray-700 text-sm font-bold mb-2">Subheading Content:</label>
+          <input id="subheading-{{i}}" type="text" formControlName="content"
+                 class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+          <div *ngIf="blockControl.get('content')?.invalid && blockControl.get('content')?.touched" class="text-red-500 text-xs italic mt-1">
+            Subheading content is required.
+          </div>
+        </div>
+
+        <div *ngSwitchCase="'image'" class="mb-4">
+          <label for="image-src-{{i}}" class="block text-gray-700 text-sm font-bold mb-2">Image Source (URL):</label>
+          <input id="image-src-{{i}}" type="text" formControlName="src"
+                 class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mb-2">
+          <div *ngIf="blockControl.get('src')?.invalid && blockControl.get('src')?.touched" class="text-red-500 text-xs italic mt-1">
+            Image source is required.
+          </div>
+          <label for="image-alt-{{i}}" class="block text-gray-700 text-sm font-bold mb-2">Alt Text:</label>
+          <input id="image-alt-{{i}}" type="text" formControlName="alt"
+                 class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+        </div>
+
+        <div *ngSwitchCase="'video'" class="mb-4">
+          <label for="video-src-{{i}}" class="block text-gray-700 text-sm font-bold mb-2">Video Source (URL):</label>
+          <input id="video-src-{{i}}" type="text" formControlName="src"
+                 class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+          <div *ngIf="blockControl.get('src')?.invalid && blockControl.get('src')?.touched" class="text-red-500 text-xs italic mt-1">
+            Video source is required.
+          </div>
+        </div>
+
+        <div *ngSwitchCase="'code'" class="mb-4">
+          <label for="code-lang-{{i}}" class="block text-gray-700 text-sm font-bold mb-2">Language:</label>
+          <input id="code-lang-{{i}}" type="text" formControlName="language"
+                 class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mb-2">
+          <div *ngIf="blockControl.get('language')?.invalid && blockControl.get('language')?.touched" class="text-red-500 text-xs italic mt-1">
+            Language is required.
+          </div>
+          <label for="code-content-{{i}}" class="block text-gray-700 text-sm font-bold mb-2">Code Content:</label>
+          <textarea id="code-content-{{i}}" formControlName="content" rows="5"
+                    class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"></textarea>
+          <div *ngIf="blockControl.get('content')?.invalid && blockControl.get('content')?.touched" class="text-red-500 text-xs italic mt-1">
+            Code content is required.
+          </div>
+        </div>
+
+        <div *ngSwitchCase="'link'" class="mb-4">
+          <label for="link-href-{{i}}" class="block text-gray-700 text-sm font-bold mb-2">URL:</label>
+          <input id="link-href-{{i}}" type="url" formControlName="href"
+                 class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mb-2">
+          <div *ngIf="blockControl.get('href')?.invalid && blockControl.get('href')?.touched" class="text-red-500 text-xs italic mt-1">
+            <span *ngIf="blockControl.get('href')?.errors?.['required']">URL is required.</span>
+            <span *ngIf="blockControl.get('href')?.errors?.['pattern']">Enter a valid URL.</span>
+          </div>
+          <label for="link-text-{{i}}" class="block text-gray-700 text-sm font-bold mb-2">Link Text:</label>
+          <input id="link-text-{{i}}" type="text" formControlName="text"
+                 class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+          <div *ngIf="blockControl.get('text')?.invalid && blockControl.get('text')?.touched" class="text-red-500 text-xs italic mt-1">
+            Link text is required.
+          </div>
+        </div>
+
+        <div *ngSwitchCase="'paragraph'" class="mb-4">
+          <label for="paragraph-{{i}}" class="block text-gray-700 text-sm font-bold mb-2">Paragraph Content:</label>
+          <textarea id="paragraph-{{i}}" formControlName="content" rows="3"
+                    class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"></textarea>
+          <div *ngIf="blockControl.get('content')?.invalid && blockControl.get('content')?.touched" class="text-red-500 text-xs italic mt-1">
+            Paragraph content is required.
+          </div>
+        </div>
+      </ng-container>
+    </div>
+  </div>
+
+  <div class="flex flex-wrap gap-4 mt-8 justify-center">
+    <button type="button" (click)="addBlock('heading')"
+            class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+      Add Heading
+    </button>
+    <button type="button" (click)="addBlock('subheading')"
+            class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+      Add Subheading
+    </button>
+    <button type="button" (click)="addBlock('image')"
+            class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+      Add Image
+    </button>
+    <button type="button" (click)="addBlock('video')"
+            class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+      Add Video
+    </button>
+    <button type="button" (click)="addBlock('code')"
+            class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+      Add Code
+    </button>
+    <button type="button" (click)="addBlock('link')"
+            class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+      Add Link
+    </button>
+    <button type="button" (click)="addBlock('paragraph')"
+            class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+      Add Paragraph
+    </button>
+  </div>
+
+  <div class="mt-8 text-center">
+    <button type="submit" [disabled]="!articleForm.valid"
+            class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-8 rounded-lg focus:outline-none focus:shadow-outline disabled:opacity-50 disabled:cursor-not-allowed">
+      Save Article
+    </button>
+  </div>
+</form>

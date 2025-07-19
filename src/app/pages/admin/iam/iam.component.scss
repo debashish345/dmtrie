@@ -1,0 +1,63 @@
+/* Ensure Angular Material components inherit Tailwind's font-sans */
+.mat-tab-group,
+.mat-form-field,
+.mat-button,
+.mat-card,
+.mat-list {
+  font-family: 'Inter', sans-serif;
+}
+
+/* Custom styles for Angular Material components to better integrate with Tailwind */
+.mat-tab-group {
+  --mat-tab-header-active-label-text-color: #1d4ed8; /* blue-700 */
+  --mat-tab-header-active-indicator-color: #1d4ed8; /* blue-700 */
+  --mat-tab-header-inactive-label-text-color: #4b5563; /* gray-600 */
+  --mat-tab-header-hover-label-text-color: #2563eb; /* blue-600 */
+  --mat-tab-header-ripple-color: rgba(59, 130, 246, 0.1); /* blue-500 with opacity */
+}
+
+.mat-form-field-appearance-outline .mat-form-field-outline {
+  border-radius: 0.5rem; /* rounded-lg */
+}
+
+.mat-form-field-appearance-outline .mat-form-field-outline-thick {
+  color: #3b82f6; /* blue-500 */
+}
+
+.mat-raised-button {
+  border-radius: 9999px; /* rounded-full */
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); /* shadow-lg */
+  transition: all 0.3s ease-in-out;
+}
+
+.mat-raised-button:hover {
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); /* shadow-xl */
+  transform: translateY(-2px);
+}
+
+.mat-card {
+  border-radius: 0.75rem; /* rounded-xl */
+}
+
+.mat-selection-list {
+  border-radius: 0.5rem; /* rounded-md */
+  border: 1px solid #d1d5db; /* gray-300 */
+}
+
+.mat-list-option {
+  border-bottom: 1px solid #e5e7eb; /* gray-200 */
+}
+.mat-list-option:last-child {
+  border-bottom: none;
+}
+
+/* Ensure the main container takes full width on smaller screens and centers content */
+@media (max-width: 768px) {
+  .mat-tab-group {
+    max-width: 100%;
+    margin: 0 1rem;
+  }
+  .p-6 {
+    padding: 1rem;
+  }
+}

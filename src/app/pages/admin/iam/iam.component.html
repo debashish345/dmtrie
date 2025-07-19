@@ -1,0 +1,155 @@
+<div class="min-h-screen bg-gray-50 text-gray-800 font-sans p-6 flex justify-center">
+  <mat-tab-group class="w-full max-w-5xl bg-white rounded-lg shadow-sm">
+  
+    <!-- Roles & Permissions Tab -->
+    <mat-tab label="Roles & Permissions">
+      <section class="space-y-10 p-6">
+        <h2 class="text-2xl font-semibold border-b pb-2">Manage Roles & Permissions</h2>
+
+        <!-- New Role Form -->
+        <mat-card class="p-6 shadow-sm rounded border border-blue-100 bg-blue-50">
+          <h3 class="text-lg font-medium text-blue-800 mb-4">Create New Role</h3>
+          <form [formGroup]="newRoleForm" (ngSubmit)="onCreateRole()" class="space-y-4">
+            <mat-form-field appearance="outline" class="w-full">
+              <mat-label>Role Name</mat-label>
+              <input matInput formControlName="name" placeholder="e.g., ROLE_ADMIN" />
+              @if (newRoleForm.get('name')?.invalid && newRoleForm.get('name')?.touched) {
+                <mat-error>Role name is required.</mat-error>
+              }
+            </mat-form-field>
+            <button mat-raised-button color="primary" type="submit" [disabled]="newRoleForm.invalid" class="ml-auto">Create</button>
+          </form>
+        </mat-card>
+
+        <!-- New Permission Form -->
+        <mat-card class="p-6 shadow-sm rounded border border-green-100 bg-green-50">
+          <h3 class="text-lg font-medium text-green-800 mb-4">Create New Permission</h3>
+          <form [formGroup]="newPermissionForm" (ngSubmit)="onCreatePermission()" class="space-y-4">
+            <mat-form-field appearance="outline" class="w-full">
+              <mat-label>Permission Name</mat-label>
+              <input matInput formControlName="name" placeholder="e.g., POST_READ_ANY" />
+              @if (newPermissionForm.get('name')?.invalid && newPermissionForm.get('name')?.touched) {
+                <mat-error>Permission name is required.</mat-error>
+              }
+            </mat-form-field>
+            <button mat-raised-button color="accent" type="submit" [disabled]="newPermissionForm.invalid" class="ml-auto">Create</button>
+          </form>
+        </mat-card>
+
+        <!-- Assign Permissions to Role -->
+        <mat-card class="p-6 shadow-sm rounded border border-purple-100 bg-purple-50">
+          <h3 class="text-lg font-medium text-purple-800 mb-4">Assign Permissions to Role</h3>
+          <form [formGroup]="assignPermissionsToRoleForm" (ngSubmit)="onUpdateRolePermissions()" class="space-y-4">
+            <mat-form-field appearance="outline" class="w-full">
+              <mat-label>Select Role</mat-label>
+              <mat-select formControlName="roleId">
+                @for (role of roles; track role.id) {
+                  <mat-option [value]="role.id">{{ role.name }}</mat-option>
+                }
+              </mat-select>
+              @if (assignPermissionsToRoleForm.get('roleId')?.invalid && assignPermissionsToRoleForm.get('roleId')?.touched) {
+                <mat-error>Please select a role.</mat-error>
+              }
+            </mat-form-field>
+
+            @if (selectedRoleForPermissions) {
+              <div>
+                <h4 class="text-base font-medium mb-2 text-purple-700">Permissions for {{ selectedRoleForPermissions.name }}</h4>
+                <mat-selection-list [formControl]="permissionsForSelectedRole" class="max-h-60 overflow-y-auto">
+                  @for (permission of permissions; track permission.id) {
+                    <mat-list-option [value]="permission.id">{{ permission.name }}</mat-list-option>
+                  }
+                </mat-selection-list>
+              </div>
+            }
+
+            <button mat-raised-button color="primary" type="submit" [disabled]="assignPermissionsToRoleForm.invalid" class="ml-auto">Update</button>
+          </form>
+        </mat-card>
+
+        <!-- Current Roles -->
+        <mat-card class="p-6 shadow-sm rounded border border-gray-200">
+          <h3 class="text-lg font-medium mb-4">Current Roles</h3>
+          <mat-list>
+            @for (role of roles; track role.id) {
+              <mat-list-item class="py-2 border-b last:border-b-0">
+                <div>
+                  <p class="font-medium text-blue-700">{{ role.name }}</p>
+                  <p class="text-sm text-gray-600">Permissions: {{ getRolePermissionsNames(role) || 'None' }}</p>
+                </div>
+              </mat-list-item>
+            }
+          </mat-list>
+        </mat-card>
+
+        <!-- Current Permissions -->
+        <mat-card class="p-6 shadow-sm rounded border border-gray-200">
+          <h3 class="text-lg font-medium mb-4">Current Permissions</h3>
+          <mat-list>
+            @for (permission of permissions; track permission.id) {
+              <mat-list-item class="py-2 border-b last:border-b-0">
+                <p class="font-medium text-green-700">{{ permission.name }}</p>
+              </mat-list-item>
+            }
+          </mat-list>
+        </mat-card>
+      </section>
+    </mat-tab>
+
+    <!-- User Management Tab -->
+    <mat-tab label="User Management">
+      <section class="space-y-10 p-6">
+        <h2 class="text-2xl font-semibold border-b pb-2">Manage User Roles</h2>
+
+        <!-- Assign Roles to User -->
+        <mat-card class="p-6 shadow-sm rounded border border-yellow-100 bg-yellow-50">
+          <h3 class="text-lg font-medium text-yellow-800 mb-4">Assign Roles to User</h3>
+          <form [formGroup]="assignRolesToUserForm" (ngSubmit)="onUpdateUserRoles()" class="space-y-4">
+            <mat-form-field appearance="outline" class="w-full">
+              <mat-label>Select User</mat-label>
+              <mat-select formControlName="userId">
+                @for (user of users; track user.id) {
+                  <mat-option [value]="user.id">{{ user.name }} ({{ user.email }})</mat-option>
+                }
+              </mat-select>
+              @if (assignRolesToUserForm.get('userId')?.invalid && assignRolesToUserForm.get('userId')?.touched) {
+                <mat-error>Please select a user.</mat-error>
+              }
+            </mat-form-field>
+
+            @if (selectedUserForRoles) {
+              <div>
+                <h4 class="text-base font-medium mb-2 text-yellow-700">Roles for {{ selectedUserForRoles.name }}</h4>
+                <mat-selection-list [formControl]="rolesForSelectedUser" class="max-h-60 overflow-y-auto">
+                  @for (role of roles; track role.id) {
+                    <mat-list-option [value]="role.id">{{ role.name }}</mat-list-option>
+                  }
+                </mat-selection-list>
+              </div>
+            }
+
+            <button mat-raised-button color="primary" type="submit" [disabled]="assignRolesToUserForm.invalid" class="ml-auto">Update</button>
+          </form>
+        </mat-card>
+
+        <!-- Current Users -->
+        <mat-card class="p-6 shadow-sm rounded border border-gray-200">
+          <h3 class="text-lg font-medium mb-4">Current Users</h3>
+          <mat-list>
+            @for (user of users; track user.id) {
+              <mat-list-item class="py-3 border-b last:border-b-0">
+                <div>
+                  <p class="font-medium text-blue-700">{{ user.name }} ({{ user.email }})</p>
+                  <p class="text-sm text-gray-600">Provider: {{ user.provider }}</p>
+                  <p class="text-sm text-gray-600">Email Verified: {{ user.emailVerified ? 'Yes' : 'No' }}</p>
+                  <p class="text-sm text-gray-600">Roles: {{ getUserRolesNames(user) || 'None' }}</p>
+                </div>
+              </mat-list-item>
+            }
+          </mat-list>
+        </mat-card>
+      </section>
+    </mat-tab>
+
+  </mat-tab-group>
+</div>
